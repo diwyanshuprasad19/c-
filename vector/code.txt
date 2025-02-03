@@ -1,4 +1,137 @@
-article:
+article:https://nitishhsinghhh.medium.com/mastering-vectors-in-c-41029caae196
+vector explaination
+
 
 code:
+https://blog.devgenius.io/implementing-a-vector-container-data-structure-in-c-using-templates-79b247784fc8
+
+
+#include <iostream>
+
+template <typename T>
+class Vector {
+private:
+    int m_size;
+    int m_capacity;
+    T* m_data;
+
+public:
+    // Default Constructor
+    Vector() : m_size(0), m_capacity(2), m_data(new T[m_capacity]) {}
+
+    // Constructor with Size Argument
+    Vector(int size)
+        : m_size(size), m_capacity(2 * size), m_data(new T[m_capacity]) {}
+
+    // Copy Constructor
+    Vector(const Vector& other)
+        : m_size(other.m_size), m_capacity(other.m_capacity),
+          m_data(new T[m_capacity]) {
+        for (int i = 0; i < m_size; i++)
+            m_data[i] = other.m_data[i];
+    }
+
+    // Destructor
+    ~Vector() {
+        delete[] m_data;
+    }
+
+    // Reserve function to increase capacity
+    void reserve(int newCapacity) {
+        if (newCapacity <= m_capacity) return;
+
+        T* newData = new T[newCapacity];
+        for (int i = 0; i < m_size; i++)
+            newData[i] = m_data[i];
+
+        delete[] m_data;
+        m_data = newData;
+        m_capacity = newCapacity;
+    }
+
+    // Push back function to add element
+    void push_back(const T& val) {
+        if (m_size >= m_capacity)
+            reserve(m_capacity * 2);
+        m_data[m_size++] = val;
+    }
+
+    // Pop back function to remove last element
+    void pop_back() {
+        if (m_size > 0)
+            m_size--;
+    }
+
+    // Insert at specific index
+    void insertAt(const T& val, int index) {
+        if (index < 0 || index > m_size)
+            return;
+
+        if (m_size >= m_capacity)
+            reserve(m_capacity * 2);
+
+        for (int i = m_size - 1; i >= index; i--)
+            m_data[i + 1] = m_data[i];
+
+        m_data[index] = val;
+        m_size++;
+    }
+
+    // Operator Overloading for accessing elements
+    T& operator[](int index) { return m_data[index]; }
+    const T& operator[](int index) const { return m_data[index]; }
+
+    // Returns current size of vector
+    int size() const { return m_size; }
+
+    // Checks if the vector is empty
+    bool empty() const { return m_size == 0; }
+
+    // Returns the current capacity
+    int capacity() const { return m_capacity; }
+
+    // Prints the elements in the vector
+    void print() const {
+        for (int i = 0; i < m_size; i++)
+            std::cout << m_data[i] << " ";
+        std::cout << std::endl;
+    }
+};
+
+// Main function to test the Vector class
+int main() {
+    Vector<int> vec;
+
+    vec.push_back(1);
+    vec.push_back(2);
+    vec.push_back(3);
+    vec.push_back(4);
+
+    std::cout << "Vector after push_back operations: ";
+    vec.print();
+
+    vec.pop_back();
+    std::cout << "Vector after pop_back operation: ";
+    vec.print();
+
+    vec.insertAt(10, 1);
+    std::cout << "Vector after inserting 10 at index 1: ";
+    vec.print();
+
+    std::cout << "Size: " << vec.size() << std::endl;
+    std::cout << "Capacity: " << vec.capacity() << std::endl;
+
+    return 0;
+}
+
+
+output
+Vector after push_back operations: 1 2 3 4 
+Vector after pop_back operation: 1 2 3 
+Vector after inserting 10 at index 1: 1 10 2 3 
+Size: 4
+Capacity: 8
+
+
+
 
