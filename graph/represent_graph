@@ -1,0 +1,259 @@
+Here is a comprehensive guide to graph representations in C++ using Adjacency Matrix, Adjacency List, and Edge List along with visual representations.
+
+1️⃣ Adjacency Matrix Representation
+Uses a 2D array (matrix[V][V])
+Space Complexity: 
+𝑂
+(
+𝑉
+2
+)
+O(V 
+2
+ )
+Best for: Dense graphs
+C++ Code
+cpp
+Copy
+Edit
+#include <iostream>
+using namespace std;
+
+#define V 5  // Number of vertices
+
+class Graph {
+    int adjMatrix[V][V];
+
+public:
+    Graph() {
+        // Initialize adjacency matrix with 0
+        for (int i = 0; i < V; i++)
+            for (int j = 0; j < V; j++)
+                adjMatrix[i][j] = 0;
+    }
+
+    void addEdge(int u, int v) {
+        adjMatrix[u][v] = 1;
+        adjMatrix[v][u] = 1; // For undirected graph
+    }
+
+    void display() {
+        cout << "Adjacency Matrix:\n";
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                cout << adjMatrix[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    Graph g;
+    g.addEdge(0, 1);
+    g.addEdge(0, 4);
+    g.addEdge(1, 2);
+    g.addEdge(1, 3);
+    g.addEdge(1, 4);
+    g.addEdge(2, 3);
+    g.addEdge(3, 4);
+
+    g.display();
+    return 0;
+}
+Graph Example (Adjacency Matrix)
+lua
+Copy
+Edit
+     0---1---2
+     |  /|   |
+     | / |   |
+     4---3---|
+Output
+yaml
+Copy
+Edit
+Adjacency Matrix:
+0 1 0 0 1 
+1 0 1 1 1 
+0 1 0 1 0 
+0 1 1 0 1 
+1 1 0 1 0 
+2️⃣ Adjacency List Representation
+Uses an array of lists (vector<int> adj[V])
+Space Complexity: 
+𝑂
+(
+𝑉
++
+𝐸
+)
+O(V+E)
+Best for: Sparse graphs
+C++ Code
+cpp
+Copy
+Edit
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Graph {
+    int V;
+    vector<vector<int>> adj;
+
+public:
+    Graph(int V) {
+        this->V = V;
+        adj.resize(V);
+    }
+
+    void addEdge(int u, int v) {
+        adj[u].push_back(v);
+        adj[v].push_back(u); // Undirected Graph
+    }
+
+    void display() {
+        cout << "Adjacency List:\n";
+        for (int i = 0; i < V; i++) {
+            cout << i << " -> ";
+            for (int j : adj[i])
+                cout << j << " ";
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    Graph g(5);
+    g.addEdge(0, 1);
+    g.addEdge(0, 4);
+    g.addEdge(1, 2);
+    g.addEdge(1, 3);
+    g.addEdge(1, 4);
+    g.addEdge(2, 3);
+    g.addEdge(3, 4);
+
+    g.display();
+    return 0;
+}
+Graph Example (Adjacency List)
+rust
+Copy
+Edit
+0 -> 1 4
+1 -> 0 2 3 4
+2 -> 1 3
+3 -> 1 2 4
+4 -> 0 1 3
+Output
+rust
+Copy
+Edit
+Adjacency List:
+0 -> 1 4 
+1 -> 0 2 3 4 
+2 -> 1 3 
+3 -> 1 2 4 
+4 -> 0 1 3 
+3️⃣ Edge List Representation
+Uses a list of pairs (vector<pair<int, int>> edges)
+Space Complexity: 
+𝑂
+(
+𝐸
+)
+O(E)
+Best for: Edge-heavy operations
+C++ Code
+cpp
+Copy
+Edit
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Graph {
+    int V;
+    vector<pair<int, int>> edges;
+
+public:
+    Graph(int V) {
+        this->V = V;
+    }
+
+    void addEdge(int u, int v) {
+        edges.push_back({u, v});
+    }
+
+    void display() {
+        cout << "Edge List:\n";
+        for (auto edge : edges)
+            cout << edge.first << " -- " << edge.second << endl;
+    }
+};
+
+int main() {
+    Graph g(5);
+    g.addEdge(0, 1);
+    g.addEdge(0, 4);
+    g.addEdge(1, 2);
+    g.addEdge(1, 3);
+    g.addEdge(1, 4);
+    g.addEdge(2, 3);
+    g.addEdge(3, 4);
+
+    g.display();
+    return 0;
+}
+Graph Example (Edge List)
+lua
+Copy
+Edit
+Edges:
+0 -- 1
+0 -- 4
+1 -- 2
+1 -- 3
+1 -- 4
+2 -- 3
+3 -- 4
+Output
+lua
+Copy
+Edit
+Edge List:
+0 -- 1
+0 -- 4
+1 -- 2
+1 -- 3
+1 -- 4
+2 -- 3
+3 -- 4
+Comparison of Graph Representations
+Representation	Space Complexity	Best for
+Adjacency Matrix	
+𝑂
+(
+𝑉
+2
+)
+O(V 
+2
+ )	Dense Graphs
+Adjacency List	
+𝑂
+(
+𝑉
++
+𝐸
+)
+O(V+E)	Sparse Graphs
+Edge List	
+𝑂
+(
+𝐸
+)
+O(E)	Edge-heavy operations

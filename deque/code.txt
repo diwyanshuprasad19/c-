@@ -1,0 +1,232 @@
+
+
+code:
+#include <iostream>
+
+template <typename T>
+class SimpleDeque {
+private:
+    static const size_t BLOCK_SIZE = 8; // Fixed block size
+    T** map;  // Pointer to an array of pointers (blocks)
+    size_t map_size;  // Number of allocated blocks
+    size_t start;  // Index of the first element
+    size_t finish; // Index after the last element
+    size_t size;   // Number of elements in deque
+    size_t front_block; // Front block index
+    size_t back_block;  // Back block index
+
+public:
+    // Constructor initializes the deque with a single allocated block
+    SimpleDeque() : map(nullptr), map_size(0), start(0), finish(0), size(0), front_block(0), back_block(0) {
+        map_size = 8; // Initial number of blocks
+        map = new T*[map_size]; // Allocate space for map pointers
+        for (size_t i = 0; i < map_size; ++i) {
+            map[i] = nullptr; // Initialize blocks as null
+        }
+        map[0] = new T[BLOCK_SIZE]; // Allocate first block
+    }
+
+    // Push an element to the back of the deque
+    void push_back(const T& value) {
+        // If the current block is full, allocate a new one
+        if (size == 0 || finish == BLOCK_SIZE) {
+            if (back_block == map_size - 1) {
+                // Resize map if needed (double the size)
+                size_t new_map_size = map_size * 2;
+                T** new_map = new T*[new_map_size];
+                
+                // Copy old blocks to the new map
+                for (size_t i = 0; i < map_size; ++i) {
+                    new_map[i] = map[i];
+                }
+                
+                // Initialize new blocks as null
+                for (size_t i = map_size; i < new_map_size; ++i) {
+                    new_map[i] = nullptr;
+                }
+                
+                delete[] map; // Free old map
+                map = new_map; // Point to new map
+                map_size = new_map_size; // Update map size
+            }
+            if (map[back_block + 1] == nullptr) {
+                map[back_block + 1] = new T[BLOCK_SIZE]; // Allocate a new block
+            }
+            ++back_block; // Move to the new block
+            finish = 0; // Reset finish index
+        }
+        map[back_block][finish] = value; // Insert value
+        ++finish;
+        ++size;
+    }
+
+    // Access an element at a specific index
+    T& operator[](size_t n) {
+        size_t block = (start + n) / BLOCK_SIZE; // Find block index
+        size_t offset = (start + n) % BLOCK_SIZE; // Find offset in block
+        return map[front_block + block][offset]; // Return element reference
+    }
+
+    // Get the number of elements in the deque
+    size_t get_size() const {
+        return size;
+    }
+
+    // Destructor to free allocated memory
+    ~SimpleDeque() {
+        for (size_t i = 0; i < map_size; ++i) {
+            delete[] map[i]; // Delete each block
+        }
+        delete[] map; // Delete map array
+    }
+};
+
+// Driver code to test SimpleDeque
+int main() {
+    SimpleDeque<int> dq;
+
+    // Add elements to deque
+    dq.push_back(1);
+    dq.push_back(2);
+    dq.push_back(3);
+    dq.push_back(4);
+    dq.push_back(5);
+
+    // Print elements using operator[]
+    std::cout << "Elements in SimpleDeque: ";
+    for (size_t i = 0; i < dq.get_size(); ++i) {
+        std::cout << dq[i] << " ";
+    }
+    std::cout << std::endl;
+
+    // Print size of deque
+    std::cout << "Size of deque: " << dq.get_size() << std::endl;
+
+    return 0;
+}
+
+
+expaliantion:
+Real-Time Example of SimpleDeque with Diagrams
+The SimpleDeque class is a custom deque implementation using block-based storage. Let's break it down with real-time values, diagrams, and pointer structure.
+
+How SimpleDeque Works (Step by Step with Diagrams)
+Step 1: Initialization
+When the deque is created:
+
+The map is an array of 8 pointers, initially all NULL.
+The first block (BLOCK_SIZE = 8) is allocated.
+Memory Representation (Before Insertions):
+
+arduino
+Copy
+Edit
+map -> [ B0 | NULL | NULL | NULL | NULL | NULL | NULL | NULL ]
+        [  ?, ?, ?, ?, ?, ?, ?, ?  ]  (Block 0, initially empty)
+Step 2: Insert Values using push_back()
+Insert 1
+1 is inserted into map[0][0].
+
+arduino
+Copy
+Edit
+map -> [ B0 | NULL | NULL | NULL | NULL | NULL | NULL | NULL ]
+        [  1, ?, ?, ?, ?, ?, ?, ?  ]  (finish = 1, back_block = 0)
+Insert 2, 3, 4, 5
+We keep inserting values until the first block is filled.
+
+arduino
+Copy
+Edit
+map -> [ B0 | NULL | NULL | NULL | NULL | NULL | NULL | NULL ]
+        [  1, 2, 3, 4, 5, ?, ?, ?  ]  (finish = 5)
+Step 3: Accessing Elements with operator[]
+Each element is accessed using:
+
+ini
+Copy
+Edit
+block = (start + n) / BLOCK_SIZE;
+offset = (start + n) % BLOCK_SIZE;
+Access dq[2] (Third element)
+
+ini
+Copy
+Edit
+block  = (0 + 2) / 8 = 0
+offset = (0 + 2) % 8 = 2
+map[0][2] → 3
+Access dq[4] (Fifth element)
+
+ini
+Copy
+Edit
+block  = (0 + 4) / 8 = 0
+offset = (0 + 4) % 8 = 4
+map[0][4] → 5
+Step 4: Handling Block Overflow (Insert 6, 7, 8, 9)
+When finish = 8, a new block is allocated in map[1].
+
+Insert 6, 7, 8
+sql
+Copy
+Edit
+map -> [ B0  | B1   | NULL | NULL | NULL | NULL | NULL | NULL ]
+        [ 1, 2, 3, 4, 5, 6, 7, 8 ]  (Block 0 full)
+        [ ?, ?, ?, ?, ?, ?, ?, ? ]  (Block 1 allocated, empty)
+Insert 9 → Moves to map[1][0]
+arduino
+Copy
+Edit
+map -> [ B0  | B1   | NULL | NULL | NULL | NULL | NULL | NULL ]
+        [ 1, 2, 3, 4, 5, 6, 7, 8 ]  
+        [ 9, ?, ?, ?, ?, ?, ?, ? ]  (start of new block)
+Step 5: Code Output with Real-Time Values
+cpp
+Copy
+Edit
+Elements in SimpleDeque: 1 2 3 4 5 
+Size of deque: 5
+The deque structure after inserting 5 elements:
+
+arduino
+Copy
+Edit
+map -> [ B0 | NULL | NULL | NULL | NULL | NULL | NULL | NULL ]
+        [ 1, 2, 3, 4, 5, ?, ?, ? ]  (finish = 5, back_block = 0)
+Final Diagram Summary
+After inserting 9 elements
+arduino
+Copy
+Edit
+map -> [ B0  | B1   | NULL | NULL | NULL | NULL | NULL | NULL ]
+        [ 1, 2, 3, 4, 5, 6, 7, 8 ]  
+        [ 9, ?, ?, ?, ?, ?, ?, ? ]  (back_block = 1, finish = 1)
+Each block is dynamically allocated when needed, and access remains O(1) using block and offset calculations.
+
+Key Takeaways
+Efficient Block-Based Storage
+
+No need to shift elements like in std::vector.
+New memory is allocated only when needed.
+Constant Time Access (O(1))
+
+Uses block & offset calculation for operator[].
+Efficient Insertion at Back
+
+New elements are stored in new blocks dynamically.
+
+
+Time Complexity Analysis
+Operation	Complexity	Explanation
+push_back()	O(1) (amortized)	Inserts at the back, sometimes allocates a new block.
+operator[]	O(1)	Direct index lookup using block calculation.
+get_size()	O(1)	Just returns size.
+Destructor	O(n)	Frees allocated blocks.
+Comparison with std::deque
+Feature	SimpleDeque	std::deque
+Storage	Block-based (fixed size)	Block-based (variable size)
+Insertion at end	O(1) (amortized)	O(1) (amortized)
+Random Access	O(1)	O(1)
+Memory Growth	Manual doubling	Automatic resizing
+Performance	Simple implementation	Highly optimized

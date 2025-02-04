@@ -1,0 +1,196 @@
+article:https://medium.com/@jamesmartignoni/whats-the-point-of-a-header-file-in-c-c-code-9ba16b65d1ca#:~:text=The%20header%20file%20itself%20contains,the%20implementation%20(source%20file).
+
+code:
+Here’s a breakdown of all the heap operations, their implementations, and their respective time and space complexities:
+
+1. Heap Class Creation
+cpp
+Copy
+Edit
+class heap
+{
+public:
+    int arr[100];
+    int size;
+
+    heap()
+    {
+        arr[0] = -1; // Taking 1-based indexing
+        size = 0;
+    }
+};
+Time Complexity: O(1) (Constant time for initialization)
+Space Complexity: O(N) (For storing elements in an array of size N)
+2. Heap Insertion
+cpp
+Copy
+Edit
+void Insert(int val)
+{
+    // Step 1: Add the element at the end
+    size += 1;
+    int index = size;
+    arr[index] = val;
+
+    // Step 2: Fix the heap property
+    while (index > 1)
+    {
+        int parent = index / 2; // For 1-based indexing
+        if (arr[parent] < arr[index])
+        {
+            swap(arr[parent], arr[index]);
+            index = parent;
+        }
+        else
+        {
+            return;
+        }
+    }
+}
+Time Complexity: O(log N) (At worst, the new element percolates up to the root)
+Space Complexity: O(1) (No extra space used)
+3. Heap Deletion
+cpp
+Copy
+Edit
+void deleteinheap()
+{
+    if (size == 0)
+    {
+        cout << "Nothing to delete!" << endl;
+        return;
+    }
+
+    // Step 1: Replace root with the last element
+    arr[1] = arr[size];
+
+    // Step 2: Reduce heap size
+    size--;
+
+    // Step 3: Heapify downwards
+    int i = 1;
+    while (i < size)
+    {
+        int leftIndex = 2 * i;
+        int rightIndex = 2 * i + 1;
+
+        if (leftIndex < size && arr[leftIndex] > arr[i])
+        {
+            swap(arr[leftIndex], arr[i]);
+            i = leftIndex;
+        }
+        else if (rightIndex < size && arr[rightIndex] > arr[i])
+        {
+            swap(arr[rightIndex], arr[i]);
+            i = rightIndex;
+        }
+        else
+        {
+            return;
+        }
+    }
+}
+Time Complexity: O(log N) (Heapify-down takes at most height log N)
+Space Complexity: O(1) (No extra space used)
+4. Heapify Algorithm
+cpp
+Copy
+Edit
+void heapify(int arr[], int n, int index)
+{
+    int largest = index;
+    int left = 2 * index;
+    int right = 2 * index + 1; // 1-based indexing
+
+    if (left < n && arr[largest] < arr[left])
+    {
+        largest = left;
+    }
+    if (right < n && arr[largest] < arr[right])
+    {
+        largest = right;
+    }
+    if (largest != index)
+    {
+        swap(arr[largest], arr[index]);
+        heapify(arr, n, largest);
+    }
+}
+Time Complexity: O(log N) (Recursion for heapifying at most log N levels)
+Space Complexity: O(1) (Heapify operates in-place)
+5. Heap Construction (Building Heap using Heapify)
+cpp
+Copy
+Edit
+int main(int argc, char const *argv[])
+{
+    int n = 5;
+    int arr[6] = {-1, 54, 53, 55, 52, 50};
+    
+    // Building heap
+    for(int i = n / 2; i > 0; i--)
+    {
+        heapify(arr, n, i); // 1-based indexing
+    }
+
+    for(int i = 1; i <= n; i++)
+    {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+    return 0;
+}
+Time Complexity: O(N) (Heapify called on N/2 non-leaf nodes, each taking O(log N))
+Space Complexity: O(1) (In-place operations)
+6. Heap Sort
+cpp
+Copy
+Edit
+void heapsort(int arr[], int size)
+{
+    while (size > 1)
+    {
+        // Step 1: Swap first and last element
+        swap(arr[1], arr[size]);
+        size--;
+
+        // Step 2: Heapify the root node
+        heapify(arr, size, 1);
+    }
+}
+
+int main(int argc, char const *argv[])
+{
+    int n = 5;
+    int arr[6] = {-1, 54, 53, 55, 52, 50};
+    
+    // Heap creation
+    for (int i = n / 2; i > 0; i--)
+    {
+        heapify(arr, n, i);
+    }
+
+    // Sorting
+    heapsort(arr, n);
+
+    for (int i = 1; i <= n; i++)
+    {
+        cout << arr[i] << " ";
+    }
+    cout << endl;
+
+    return 0;
+}
+Time Complexity: O(N log N)
+Building the heap takes O(N).
+Heap sort operations (deletion + heapify) run N times, each taking O(log N).
+Total complexity: O(N log N).
+Space Complexity: O(1) (Heap sort is in-place)
+Summary Table of Time and Space Complexity
+Operation	Time Complexity	Space Complexity
+Heap Initialization	O(1)	O(N)
+Heap Insertion	O(log N)	O(1)
+Heap Deletion	O(log N)	O(1)
+Heapify	O(log N)	O(1)
+Building Heap (Heapify approach)	O(N)	O(1)
+Heap Sort	O(N log N)	O(1)

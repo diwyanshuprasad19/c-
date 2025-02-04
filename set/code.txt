@@ -1,0 +1,97 @@
+
+
+code:
+#include <iostream>
+#include <list>
+#include <vector>
+
+using namespace std;
+
+// Custom HashSet class
+class MyUnorderedSet {
+private:
+    static const int SIZE = 100; // Hash table size
+    vector<list<int>> table; // Array of linked lists for chaining
+
+    // Hash function to determine the index
+    int hashFunction(int key) {
+        return key % SIZE; // Simple modulo hashing
+    }
+
+public:
+    // Constructor: Initializes hash table
+    MyUnorderedSet() {
+        table.resize(SIZE);
+    }
+
+    // Insert function
+    void insert(int key) {
+        int index = hashFunction(key);
+        for (int element : table[index]) {
+            if (element == key) return; // Avoid duplicates
+        }
+        table[index].push_back(key);
+    }
+
+    // Erase function
+    void erase(int key) {
+        int index = hashFunction(key);
+        table[index].remove(key);
+    }
+
+    // Find function (Check if element exists)
+    bool find(int key) {
+        int index = hashFunction(key);
+        for (int element : table[index]) {
+            if (element == key) return true;
+        }
+        return false;
+    }
+
+    // Display all elements
+    void display() {
+        cout << "Elements in MyUnorderedSet: ";
+        for (int i = 0; i < SIZE; i++) {
+            for (int element : table[i]) {
+                cout << element << " ";
+            }
+        }
+        cout << endl;
+    }
+
+    // Get size (number of elements in the set)
+    int size() {
+        int count = 0;
+        for (int i = 0; i < SIZE; i++) {
+            count += table[i].size();
+        }
+        return count;
+    }
+};
+
+// Main function to test the custom unordered_set
+int main() {
+    MyUnorderedSet mySet;
+
+    mySet.insert(10);
+    mySet.insert(20);
+    mySet.insert(30);
+    mySet.insert(10); // Duplicate, should be ignored
+
+    mySet.display();
+
+    cout << "Is 20 present? " << (mySet.find(20) ? "Yes" : "No") << endl;
+    cout << "Is 40 present? " << (mySet.find(40) ? "Yes" : "No") << endl;
+
+    mySet.erase(10);
+    mySet.display();
+
+    cout << "Size of MyUnorderedSet: " << mySet.size() << endl;
+
+    return 0;
+}
+
+
+Average case time complexity:
+insert(), erase(), and find() → O(1)
+display() and size() → O(n)
